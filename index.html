@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#635bdb">
+    <meta name="description" content="StudyPlan: organiza tus materias, tareas y calificaciones.">
+
+    <title>StudyPlan - Organizador Académico</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+
+    <!-- PANTALLA SPLASH -->
+    <div id="splash" class="splash">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <i data-lucide="graduation-cap"></i>
+            </div>
+            <h1>StudyPlan</h1>
+            <p>Organiza tu vida académica</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN -->
+    <div id="app" class="app hidden">
+
+        <!-- MENÚ LATERAL -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>
+                    <span class="brand-badge">
+                        <i data-lucide="graduation-cap"></i>
+                    </span>
+                    StudyPlan
+                </h2>
+                <p>Mi espacio académico</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="inicio" type="button">
+                    <i data-lucide="home"></i>
+                    <span>Inicio</span>
+                </button>
+                <button class="nav-item" data-view="materias" type="button">
+                    <i data-lucide="book-open"></i>
+                    <span>Materias</span>
+                </button>
+                <button class="nav-item" data-view="tareas" type="button">
+                    <i data-lucide="check-square"></i>
+                    <span>Tareas</span>
+                </button>
+                <button class="nav-item" data-view="calificaciones" type="button">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Calificaciones</span>
+                </button>
+                <button class="nav-item" data-view="calendario" type="button">
+                    <i data-lucide="calendar"></i>
+                    <span>Calendario</span>
+                </button>
+                <button class="nav-item" data-view="escaner" type="button">
+                    <i data-lucide="camera"></i>
+                    <span>Escáner</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>StudyPlan © 2026</p>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h1 id="page-title">Inicio</h1>
+                    <p>Bienvenido a StudyPlan</p>
+                </div>
+                <button id="notification-btn" class="notification-button" type="button" aria-label="Notificaciones">
+                    <i data-lucide="bell"></i>
+                </button>
+            </header>
+
+            <div id="connection-status" class="connection-status"></div>
+
+            <div id="view-container">
+
+                <!-- INICIO -->
+                <section id="inicio" class="view active">
+                    <div class="welcome-card">
+                        <h2>¡Hola!</h2>
+                        <p>Organiza tus actividades y alcanza tus objetivos académicos.</p>
+                        <i data-lucide="sparkles" class="welcome-bg-icon"></i>
+                    </div>
+
+                    <div class="stats-grid">
+                        <article class="stat-card">
+                            <span class="stat-icon-box">
+                                <i data-lucide="book-open"></i>
+                            </span>
+                            <h3 id="total-subjects">0</h3>
+                            <p>Materias</p>
+                        </article>
+
+                        <article class="stat-card">
+                            <span class="stat-icon-box">
+                                <i data-lucide="clock"></i>
+                            </span>
+                            <h3 id="total-pending">0</h3>
+                            <p>Tareas pendientes</p>
+                        </article>
+
+                        <article class="stat-card">
+                            <span class="stat-icon-box">
+                                <i data-lucide="check-circle-2"></i>
+                            </span>
+                            <h3 id="total-completed">0</h3>
+                            <p>Tareas completadas</p>
+                        </article>
+
+                        <article class="stat-card">
+                            <span class="stat-icon-box">
+                                <i data-lucide="award"></i>
+                            </span>
+                            <h3 id="general-average">0.0</h3>
+                            <p>Promedio general</p>
+                        </article>
+                    </div>
+
+                    <div class="card">
+                        <h2>Próximas tareas</h2>
+                        <div id="upcoming-tasks">
+                            <p>Aún no hay tareas registradas.</p>
+                        </div>
+                    </div>
+
+                    <!-- PANEL DE SINCRONIZACIÓN -->
+                    <div class="card sync-card">
+                        <h2>Sincronización</h2>
+
+                        <p>Estado de conexión:</p>
+                        <div id="sync-status" class="sync-online">
+                            Comprobando conexión...
+                        </div>
+
+                        <p>
+                            Registros pendientes:
+                            <strong id="pending-sync-count">0</strong>
+                        </p>
+
+                        <div class="form-actions">
+
+                            <button id="remote-sync-btn" class="primary-button" type="button">
+                                <i data-lucide="cloud-upload"></i>
+                                Sincronizar ahora
+                            </button>
+
+                            <button id="remote-load-btn" class="secondary-button" type="button">
+                                <i data-lucide="cloud-download"></i>
+                                Consultar servidor
+                            </button>
+                        </div>
+
+                        <p id="remote-data-status" role="status">
+                            Los datos remotos aún no se han consultado.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- MATERIAS -->
+                <section id="materias" class="view">
+                    <div class="section-header">
+                        <div>
+                            <h2>Mis materias</h2>
+                            <p>Administra tus materias y horarios académicos.</p>
+                        </div>
+
+                        <button id="add-subject" class="primary-button" type="button">
+                            <i data-lucide="plus"></i>
+                            Agregar materia
+                        </button>
+                    </div>
+
+                    <div id="subject-form-container" class="card hidden">
+                        <h3 id="subject-form-title">Agregar materia</h3>
+
+                        <form id="subject-form">
+                            <div class="form-group">
+                                <label for="subject-name">Nombre de la materia</label>
+                                <input
+                                    type="text"
+                                    id="subject-name"
+                                    placeholder="Ej. Programación Web"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject-teacher">Profesor</label>
+                                <input
+                                    type="text"
+                                    id="subject-teacher"
+                                    placeholder="Nombre del profesor"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject-schedule">Horario</label>
+                                <input
+                                    type="text"
+                                    id="subject-schedule"
+                                    placeholder="Ej. Lunes y miércoles, 10:00 - 12:00"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject-color">Color de la materia</label>
+                                <input
+                                    type="color"
+                                    id="subject-color"
+                                    value="#635bdb"
+                                >
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="primary-button">
+                                    <i data-lucide="save"></i>
+                                    Guardar materia
+                                </button>
+
+                                <button type="button" id="cancel-subject" class="secondary-button">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="subjects-list" class="subjects-grid">
+                        <p>Cargando materias...</p>
+                    </div>
+                </section>
+
+                <!-- TAREAS -->
+                <section id="tareas" class="view">
+                    <div class="section-header">
+                        <div>
+                            <h2>Mis tareas</h2>
+                            <p>Organiza tus actividades y fechas de entrega.</p>
+                        </div>
+
+                        <button id="add-task" class="primary-button" type="button">
+                            <i data-lucide="plus"></i>
+                            Agregar tarea
+                        </button>
+                        <button
+    type="button"
+    id="load-tasks-remote"
+    class="secondary-button"
+>
+    <i data-lucide="cloud-download"></i>
+    Consultar tareas del servidor
+</button>
+                    </div>
+
+                    <!-- FORMULARIO DE TAREAS -->
+                    <div id="task-form-container" class="card hidden">
+                        <h3 id="task-form-title">Agregar tarea</h3>
+
+                        <form id="task-form">
+                            <div class="form-group">
+                                <label for="task-name">Nombre de la tarea</label>
+                                <input
+                                    type="text"
+                                    id="task-name"
+                                    placeholder="Ej. Investigar sobre bases de datos"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="task-description">Descripción</label>
+                                <textarea
+                                    id="task-description"
+                                    placeholder="Describe lo que necesitas realizar"
+                                    rows="3"
+                                ></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="task-subject">Materia</label>
+                                <select id="task-subject">
+                                    <option value="">Sin materia asignada</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="task-date">Fecha de entrega</label>
+                                <input type="date" id="task-date" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="task-priority">Prioridad</label>
+                                <select id="task-priority">
+                                    <option value="baja">Baja</option>
+                                    <option value="media" selected>Media</option>
+                                    <option value="alta">Alta</option>
+                                </select>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="primary-button">
+                                    <i data-lucide="save"></i>
+                                    Guardar tarea
+                                </button>
+
+                                <button type="button" id="cancel-task" class="secondary-button">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- LISTA DE TAREAS -->
+                    <div id="tasks-list" class="tasks-grid">
+                        <p>Cargando tareas...</p>
+                    </div>
+                </section>
+
+                <!-- CALIFICACIONES -->
+                <section id="calificaciones" class="view">
+                    <div class="section-header">
+                        <div>
+                            <h2>Calificaciones</h2>
+                            <p>Registra tus evaluaciones y consulta tus promedios.</p>
+                        </div>
+
+                        <button id="add-grade" class="primary-button" type="button">
+                            <i data-lucide="plus"></i>
+                            Agregar calificación
+                        </button>
+                        <button
+    type="button"
+    id="load-grades-remote"
+    class="secondary-button"
+>
+    <i data-lucide="cloud-download"></i>
+    Consultar calificaciones del servidor
+</button>
+                    </div>
+
+                    <div id="grade-form-container" class="form-container hidden">
+                        <h3 id="grade-form-title">Nueva calificación</h3>
+
+                        <form id="grade-form">
+                            <div class="form-group">
+                                <label for="grade-name">Nombre de la evaluación</label>
+                                <input
+                                    type="text"
+                                    id="grade-name"
+                                    placeholder="Ej. Examen parcial"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="grade-subject">Materia</label>
+                                <select id="grade-subject" required>
+                                    <option value="">Selecciona una materia</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="grade-score">Calificación (0 a 10)</label>
+                                <input
+                                    type="number"
+                                    id="grade-score"
+                                    min="0"
+                                    max="10"
+                                    step="0.1"
+                                    placeholder="Ej. 9.5"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="grade-weight">Ponderación (%)</label>
+                                <input
+                                    type="number"
+                                    id="grade-weight"
+                                    min="0.1"
+                                    max="100"
+                                    step="0.1"
+                                    placeholder="Ej. 30"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="grade-date">Fecha de evaluación</label>
+                                <input type="date" id="grade-date" required>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="primary-button">
+                                    <i data-lucide="save"></i>
+                                    Guardar calificación
+                                </button>
+
+                                <button type="button" id="cancel-grade" class="secondary-button">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="grades-section">
+                        <h3>Promedio por materia</h3>
+                        <div id="subject-averages"></div>
+                    </div>
+
+                    <div class="grades-section">
+                        <h3>Evaluaciones registradas</h3>
+                        <div id="grades-list"></div>
+                    </div>
+                </section>
+
+                <!-- CALENDARIO -->
+                <section id="calendario" class="view">
+                    <div class="section-header">
+                        <div>
+                            <h2>Calendario académico</h2>
+                            <p>Organiza tus actividades y fechas de entrega.</p>
+                        </div>
+                    </div>
+
+                    <div id="calendar-container"></div>
+                </section>
+
+                <!-- ESCÁNER -->
+                <section id="escaner" class="view">
+                    <div class="card">
+                        <h2>Escáner de documentos</h2>
+                        <p>Utiliza la cámara para capturar tus apuntes.</p>
+
+                        <video
+    id="camera-preview"
+    class="camera-preview"
+    autoplay
+    playsinline
+></video>
+                        <canvas id="camera-canvas" class="hidden"></canvas>
+
+                        <div class="form-actions">
+                            <button id="start-camera" class="primary-button" type="button">
+                                <i data-lucide="video"></i>
+                                Activar cámara
+                            </button>
+
+                            <button id="take-photo" class="primary-button" type="button">
+                                <i data-lucide="camera"></i>
+                                Tomar fotografía
+                            </button>
+
+                            <button id="stop-camera" class="secondary-button" type="button">
+                                <i data-lucide="video-off"></i>
+                                Detener cámara
+                            </button>
+                        </div>
+
+                        <div id="photo-result"></div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ÍCONOS LUCIDE -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <!-- SCRIPTS DE LA APP -->
+    <script src="js/database.js"></script>
+    <script src="js/sync.js"></script>
+    <script src="js/subjects.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/grades.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/remote-panels.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

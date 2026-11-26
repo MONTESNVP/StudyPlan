@@ -1,0 +1,25 @@
+
+# Archivos temporales
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Configuración local
+.env
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Base de datos local
+server/*.db
